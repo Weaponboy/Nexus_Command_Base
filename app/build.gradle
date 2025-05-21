@@ -1,0 +1,139 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        google()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:8.0.0"
+    }
+}
+
+plugins {
+    id 'maven-publish'
+}
+
+apply plugin: 'com.android.library'
+
+group 'dev.weaponboy.nexus_pathing'
+version = 'v0.0.0'
+
+android {
+    namespace 'dev.weaponboy.nexus_command_base'
+    compileSdk 35
+
+    defaultConfig {
+//        applicationId "dev.weaponboy.nexus_command_base"
+        minSdk 24
+        targetSdk 35
+        versionCode 1
+        versionName 'v0.0.0'
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+        }
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src/main/java']
+            }
+            resources {
+                srcDirs = ['src/main/resources']
+            }
+        }
+    }
+
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+        google()
+    }
+}
+
+repositories {
+    mavenCentral()
+    google()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testImplementation 'org.jetbrains:annotations:24.0.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+
+    compileOnly 'org.firstinspires.ftc:RobotCore:10.2.0'
+    compileOnly 'org.firstinspires.ftc:RobotServer:10.2.0'
+    compileOnly 'org.firstinspires.ftc:Hardware:10.2.0'
+    compileOnly 'org.firstinspires.ftc:FtcCommon:10.2.0'
+    compileOnly 'org.firstinspires.ftc:Vision:10.2.0'
+    compileOnly libs.appcompat.v161
+
+    implementation 'org.tomlj:tomlj:1.1.0'
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId = 'com.github.Weaponboy'
+                artifactId = 'Nexus_Command_Base'
+                version = 'v0.0.0'
+
+                // Include the AAR artifact
+                artifact("$buildDir/outputs/aar/${project.name}-release.aar")
+
+                pom {
+                    name = 'Nexus_Command_Base'
+                    description = 'Description of your library'
+                    url = 'http://www.example.com'
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'Weaponboy'
+                            name = 'Josh Anderson'
+                            email = 'joshandy06@gmail.com'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:git://github.com/Weaponboy/Nexus_Command_Base.git'
+                        developerConnection = 'scm:git:ssh://github.com:Weaponboy/Nexus_Command_Base.git'
+                        url = 'http://github.com/Weaponboy/Nexus_Command_Base/'
+                    }
+                }
+            }
+        }
+        repositories {
+            maven {
+                name = 'Nexus_Command_Base'
+                url = "${project.buildDir}/release"
+            }
+        }
+    }
+
+    tasks.named("publishReleasePublicationToMavenLocal") {
+        dependsOn tasks.named("assembleRelease")
+    }
+}
